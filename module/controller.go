@@ -22,8 +22,6 @@ import (
 	model "github.com/katalogsepatu/be_sepatu/model"
 )
 
-// var imageUrl string
-
 // // mongo
 func MongoConnect(MongoString, dbname string) *mongo.Database {
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(os.Getenv(MongoString)))
