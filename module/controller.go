@@ -22,7 +22,9 @@ import (
 	model "github.com/katalogsepatu/be_sepatu/model"
 )
 
-// // mongo
+var imageUrl string
+
+// mongo
 func MongoConnect(MongoString, dbname string) *mongo.Database {
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(os.Getenv(MongoString)))
 	if err != nil {
@@ -186,50 +188,50 @@ func GetUserFromPhonenumber(phonenumber string, db *mongo.Database) (doc model.U
 }
 
 // update-userProfile
-func EditProfile(idparam primitive.ObjectID, db *mongo.Database, r *http.Request) (bson.M, error) {
-	dataUser, err := GetUserFromID(idparam, db)
-	if err != nil {
-		return bson.M{}, err
-	}
-	fullname := r.FormValue("fullname")
-	phonenumber := r.FormValue("phonenumber")
+// func EditProfile(idparam primitive.ObjectID, db *mongo.Database, r *http.Request) (bson.M, error) {
+// 	dataUser, err := GetUserFromID(idparam, db)
+// 	if err != nil {
+// 		return bson.M{}, err
+// 	}
+// 	fullname := r.FormValue("fullname")
+// 	phonenumber := r.FormValue("phonenumber")
 
-	// image := r.FormValue("file")
+// 	// image := r.FormValue("file")
 
-	if fullname == "" || phonenumber == "" {
-		return bson.M{}, fmt.Errorf("mohon untuk melengkapi data")
-	}
-	// if image != "" {
-	// 	imageUrl = image
-	// } else {
-	// 	imageUrl, err = intermoni.SaveFileToGithub("erditona", "erditonaushaadam@gmail.com", "image-manja", "manja", r)
-	// 	if err != nil {
-	// 		return bson.M{}, fmt.Errorf("error save file: %s", err)
-	// 	}
-	// 	image = imageUrl
-	// }
+// 	if fullname == "" || phonenumber == "" {
+// 		return bson.M{}, fmt.Errorf("mohon untuk melengkapi data")
+// 	}
+// if image != "" {
+// 	imageUrl = image
+// } else {
+// 	imageUrl, err = intermoni.SaveFileToGithub("erditona", "erditonaushaadam@gmail.com", "image-manja", "manja", r)
+// 	if err != nil {
+// 		return bson.M{}, fmt.Errorf("error save file: %s", err)
+// 	}
+// 	image = imageUrl
+// }
 
-	profile := bson.M{
-		"fullname":    fullname,
-		"email":       dataUser.Email,
-		"password":    dataUser.Password,
-		"phonenumber": phonenumber,
-		// "image":       image,
-		"salt": dataUser.Salt,
-	}
-	err = UpdateOneDoc(idparam, db, "user", profile)
-	if err != nil {
-		return bson.M{}, err
-	}
-	data := bson.M{
-		"fullname":    fullname,
-		"email":       dataUser.Email,
-		"phonenumber": phonenumber,
-		// "image":       image,
-	}
+// 	profile := bson.M{
+// 		"fullname":    fullname,
+// 		"email":       dataUser.Email,
+// 		"password":    dataUser.Password,
+// 		"phonenumber": phonenumber,
+// 		// "image":       image,
+// 		"salt": dataUser.Salt,
+// 	}
+// 	err = UpdateOneDoc(idparam, db, "user", profile)
+// 	if err != nil {
+// 		return bson.M{}, err
+// 	}
+// 	data := bson.M{
+// 		"fullname":    fullname,
+// 		"email":       dataUser.Email,
+// 		"phonenumber": phonenumber,
+// 		// "image":       image,
+// 	}
 
-	return data, nil
-}
+// 	return data, nil
+// }
 
 func EditEmail(idparam primitive.ObjectID, db *mongo.Database, insertedDoc model.User) (bson.M, error) {
 	dataUser, err := GetUserFromID(idparam, db)
@@ -384,7 +386,6 @@ func LogIn(db *mongo.Database, col string, insertedDoc model.User) (user model.U
 }
 
 // Katalog Sepatu
-// post-fishingSpot
 func PostKatalogSepatu(db *mongo.Database, col string, r *http.Request) (bson.M, error) {
 	brand := r.FormValue("brand")
 	name := r.FormValue("name")
@@ -403,10 +404,10 @@ func PostKatalogSepatu(db *mongo.Database, col string, r *http.Request) (bson.M,
 	// 	return bson.M{}, fmt.Errorf("nomor telepon tidak valid")
 	// }
 
-	// imageUrl, err := intermoni.SaveFileToGithub("erditona", "erditonaushaadam@gmail.com", "image-manja", "manja", r)
-	// if err != nil {
-	// 	return bson.M{}, fmt.Errorf("error save file: %s", err)
-	// }
+	imageUrl, err := katalogsepatu.SaveFileToGithub("agitanurfd", "agitanurfadillah45@gmail.com", "image-sepatu", "sepatu", r)
+	if err != nil {
+		return bson.M{}, fmt.Errorf("error save file: %s", err)
+	}
 
 	katalogsepatu := bson.M{
 		"_id":      primitive.NewObjectID(),
@@ -415,16 +416,16 @@ func PostKatalogSepatu(db *mongo.Database, col string, r *http.Request) (bson.M,
 		"category": category,
 		"price":    price,
 		"color":    color,
-		// "image":    imageUrl,
+		"image":    imageUrl,
 	}
-	_, err := InsertOneDoc(db, col, katalogsepatu)
+	_, err = InsertOneDoc(db, col, katalogsepatu)
 	if err != nil {
 		return bson.M{}, err
 	}
 	return katalogsepatu, nil
 }
 
-// get-fishingSpot
+// get KatalogSepatu
 func GetKatalogSepatuById(db *mongo.Database, col string, idparam primitive.ObjectID) (doc model.KatalogSepatu, err error) {
 	collection := db.Collection(col)
 	filter := bson.M{"_id": idparam}
@@ -466,15 +467,15 @@ func PutKatalogSepatu(_id primitive.ObjectID, db *mongo.Database, col string, r 
 		return bson.M{}, fmt.Errorf("mohon untuk melengkapi data")
 	}
 
-	// if image != "" {
-	// 	imageUrl = image
-	// } else {
-	// 	imageUrl, err := intermoni.SaveFileToGithub("erditona", "erditonaushaadam@gmail.com", "image-manja", "manja", r)
-	// 	if err != nil {
-	// 		return bson.M{}, fmt.Errorf("error save file: %s", err)
-	// 	}
-	// 	image = imageUrl
-	// }
+	if image != "" {
+		imageUrl = image
+	} else {
+		imageUrl, err := katalogsepatu.SaveFileToGithub("agitanurfd", "agitanurfadillah45@gmail.com", "image-sepatu", "sepatu", r)
+		if err != nil {
+			return bson.M{}, fmt.Errorf("error save file: %s", err)
+		}
+		image = imageUrl
+	}
 
 	katalogsepatu := bson.M{
 		"brand":    brand,

@@ -87,7 +87,7 @@ func TestTambahKatalogSepatu(t *testing.T) {
 		Category: "Sepatu Pria",
 		Price:    "1.500.000",
 		Color:    "Hitam",
-		// Image: "https://www.google.com",
+		Image: "https://www.google.com",
 	})
 	if err != nil {
 		fmt.Println(err)
@@ -107,7 +107,7 @@ func TestUpdateKatalogSepatu(t *testing.T) {
 		Category: "Sepatu Pria",
 		Price:    "1.000.000",
 		Color:    "Hitam",
-		// Image: "https://www.google.com",
+		Image: "https://www.google.com",
 	})
 	if err != nil {
 		fmt.Println(err)
