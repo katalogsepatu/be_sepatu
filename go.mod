@@ -1,6 +1,6 @@
 module github.com/katalogsepatu/be_sepatu
 
-go 1.20
+go 1.21.6
 
 require (
 	aidanwoods.dev/go-paseto v1.5.1
