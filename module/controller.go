@@ -13,6 +13,7 @@ import (
 	"strings"
 
 	"github.com/badoux/checkmail"
+	intermoni "github.com/intern-monitoring/backend-intermoni"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -404,7 +405,7 @@ func PostKatalogSepatu(db *mongo.Database, col string, r *http.Request) (bson.M,
 	// 	return bson.M{}, fmt.Errorf("nomor telepon tidak valid")
 	// }
 
-	imageUrl, err := katalogsepatu.SaveFileToGithub("agitanurfd", "agitanurfadillah45@gmail.com", "image-sepatu", "sepatu", r)
+	imageUrl, err := intermoni.SaveFileToGithub("agitanurfd", "agitanurfadillah45@gmail.com", "image-sepatu", "sepatu", r)
 	if err != nil {
 		return bson.M{}, fmt.Errorf("error save file: %s", err)
 	}
@@ -470,7 +471,7 @@ func PutKatalogSepatu(_id primitive.ObjectID, db *mongo.Database, col string, r 
 	if image != "" {
 		imageUrl = image
 	} else {
-		imageUrl, err := katalogsepatu.SaveFileToGithub("agitanurfd", "agitanurfadillah45@gmail.com", "image-sepatu", "sepatu", r)
+		imageUrl, err := intermoni.SaveFileToGithub("agitanurfd", "agitanurfadillah45@gmail.com", "image-sepatu", "sepatu", r)
 		if err != nil {
 			return bson.M{}, fmt.Errorf("error save file: %s", err)
 		}
