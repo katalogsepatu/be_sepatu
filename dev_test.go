@@ -24,10 +24,11 @@ func TestGenerateKey(t *testing.T) {
 func TestSignUp(t *testing.T) {
 	conn := db
 	var user model.User
-	user.Fullname = "agita"
-	user.Email = "agita@gmail.com"
+	user.Fullname = "Agita Nurfadillah"
+	user.Email = "agitanurf@gmail.com"
 	user.Password = "agita100303"
-	user.PhoneNumber = "622246108228"
+	user.ConfirmPassword = "agita100303"
+	user.PhoneNumber = "6222461082281"
 	email, err := module.SignUp(conn, collectionnameUser, user)
 	if err != nil {
 		fmt.Println(err)
@@ -67,26 +68,16 @@ func TestToken(*testing.T) {
 // 	fmt.Println(err)
 // }
 
-func TestDeleteKatalogSepatu(t *testing.T) {
-	conn := db
-	id := "659ba18ceeb7be57547574f9"
-	objectId, err := primitive.ObjectIDFromHex(id)
-	err = module.DeleteKatalogSepatu(objectId, "katalogsepatu", conn)
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		fmt.Println("Berhasil Delete Katalog Sepatu")
-	}
-}
-
+// Katalog Sepatu
 func TestTambahKatalogSepatu(t *testing.T) {
 	id, err := module.InsertOneDoc(db, "katalogsepatu", model.KatalogSepatu{
 		ID:       primitive.NewObjectID(),
 		Brand:    "Adidas",
 		Name:     "Adidas Samba",
 		Category: "Sepatu Pria",
-		Price:    "1.500.000",
+		Price:    "1500000",
 		Color:    "Hitam",
+		Diskon:   "25%",
 		Image: "https://www.google.com",
 	})
 	if err != nil {
@@ -97,22 +88,88 @@ func TestTambahKatalogSepatu(t *testing.T) {
 }
 
 func TestUpdateKatalogSepatu(t *testing.T) {
-	id := "659ba18ceeb7be57547574f9"
+	id := "65ab46c7c0ba7ca17d5e23cc"
 	objectId, err := primitive.ObjectIDFromHex(id)
 
 	data := module.UpdateOneDoc(objectId, db, "katalogsepatu", model.KatalogSepatu{
 		ID:       objectId,
 		Brand:    "Adidas",
-		Name:     "Adidas Samba",
+		Name:     "Superstar Shoes",
 		Category: "Sepatu Pria",
-		Price:    "1.000.000",
+		Price:    "1000000",
 		Color:    "Hitam",
+		Diskon:   "25%",
 		Image: "https://www.google.com",
 	})
 	if err != nil {
 		fmt.Println(err)
 	} else {
 		fmt.Println("Berhasil UpdateKatalogSepatu", data)
+	}
+}
+
+func TestDeleteKatalogSepatu(t *testing.T) {
+	conn := db
+	id := "65ab46c7c0ba7ca17d5e23cc"
+	objectId, err := primitive.ObjectIDFromHex(id)
+	err = module.DeleteKatalogSepatu(objectId, "katalogsepatu", conn)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println("Berhasil Delete Katalog Sepatu")
+	}
+}
+
+
+// Favorite Sepatu
+func TestTambahFavoriteSepatu(t *testing.T) {
+	id, err := module.InsertOneDoc(db, "favoritesepatu", model.FavoriteSepatu{
+		ID:       primitive.NewObjectID(),
+		Brand:    "Adidas",
+		Name:     "Adidas Samba",
+		Category: "Sepatu Pria",
+		Price:    "1500000",
+		Color:    "Hitam",
+		Diskon:   "25%",
+		Image: "https://www.google.com",
+	})
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println("Berhasil Tambah Favorite Sepatu : ", id)
+	}
+}
+
+func TestUpdateFavoriteSepatu(t *testing.T) {
+	id := "65ab470fbcc1dce41393dbb9"
+	objectId, err := primitive.ObjectIDFromHex(id)
+
+	data := module.UpdateOneDoc(objectId, db, "favoritesepatu", model.FavoriteSepatu{
+		ID:       objectId,
+		Brand:    "Adidas",
+		Name:     "Superstar Shoes",
+		Category: "Sepatu Pria",
+		Price:    "1000000",
+		Color:    "Hitam",
+		Diskon:   "25%",
+		Image: "https://www.google.com",
+	})
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println("Berhasil Update Favorite Sepatu", data)
+	}
+}
+
+func TestDeleteFavoriteSepatu(t *testing.T) {
+	conn := db
+	id := "65ab470fbcc1dce41393dbb9"
+	objectId, err := primitive.ObjectIDFromHex(id)
+	err = module.DeleteFavoriteSepatu(objectId, "favoritesepatu", conn)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println("Berhasil Delete Favorite Sepatu")
 	}
 }
 

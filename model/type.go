@@ -7,12 +7,13 @@ import (
 )
 
 type User struct {
-	ID          primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
-	Fullname    string             `json:"fullname,omitempty" bson:"fullname,omitempty"`
-	Email       string             `json:"email,omitempty" bson:"email,omitempty"`
-	Password    string             `json:"password,omitempty" bson:"password,omitempty"`
-	PhoneNumber string             `json:"phonenumber,omitempty" bson:"phonenumber,omitempty"`
-	Salt        string             `bson:"salt,omitempty" json:"salt,omitempty"`
+	ID              primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
+	Fullname        string             `json:"fullname,omitempty" bson:"fullname,omitempty"`
+	Email           string             `json:"email,omitempty" bson:"email,omitempty"`
+	Password        string             `json:"password,omitempty" bson:"password,omitempty"`
+	ConfirmPassword string             `json:"confirmpassword,omitempty" bson:"confirmpassword,omitempty"`
+	PhoneNumber     string             `json:"phonenumber,omitempty" bson:"phonenumber,omitempty"`
+	Salt            string             `bson:"salt,omitempty" json:"salt,omitempty"`
 }
 
 type UpdatePassword struct {
@@ -27,6 +28,18 @@ type KatalogSepatu struct {
 	Category string             `bson:"category,omitempty" json:"category,omitempty"`
 	Price    string             `bson:"price,omitempty" json:"price,omitempty"`
 	Color    string             `bson:"color,omitempty" json:"color,omitempty"`
+	Diskon   string             `bson:"diskon,omitempty" json:"diskon,omitempty"`
+	Image    string             `json:"image,omitempty" bson:"image,omitempty"`
+}
+
+type FavoriteSepatu struct {
+	ID       primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
+	Brand    string             `bson:"brand,omitempty" json:"brand,omitempty"`
+	Name     string             `bson:"name,omitempty" json:"name,omitempty"`
+	Category string             `bson:"category,omitempty" json:"category,omitempty"`
+	Price    string             `bson:"price,omitempty" json:"price,omitempty"`
+	Color    string             `bson:"color,omitempty" json:"color,omitempty"`
+	Diskon   string             `bson:"diskon,omitempty" json:"diskon,omitempty"`
 	Image    string             `json:"image,omitempty" bson:"image,omitempty"`
 }
 

@@ -198,6 +198,7 @@ func EditEmailHandler(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, r *
 	return GCFReturnStruct(responData)
 }
 
+// Katalog Sepatu
 func TambahKatalogSepatuHandler(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, collectionname string, r *http.Request) string {
 	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)
 	response.Status = 400
@@ -307,6 +308,149 @@ func EditKatalogSepatuHandler(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname str
 }
 
 func DeleteKatalogSepatuHandler(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, collectionname string, r *http.Request) string {
+	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)
+	response.Status = 400
+	//
+	user, err := GetUserLogin(PASETOPUBLICKEYENV, r)
+	if err != nil {
+		response.Message = err.Error()
+		return GCFReturnStruct(response)
+	}
+	if user.Email != "admin@gmail.com" {
+		response.Message = "Anda tidak memiliki akses"
+		return GCFReturnStruct(response)
+	}
+	id := GetID(r)
+	if id == "" {
+		response.Message = "Wrong parameter"
+		return GCFReturnStruct(response)
+	}
+	idparam, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		response.Message = "Invalid id parameter"
+		return GCFReturnStruct(response)
+	}
+	err = DeleteKatalogSepatu(idparam, collectionname, conn)
+	if err != nil {
+		response.Message = err.Error()
+		return GCFReturnStruct(response)
+	}
+	//
+	response.Status = 204
+	response.Message = "Berhasil menghapus Katalog Spot"
+	return GCFReturnStruct(response)
+}
+
+// Favorite Sepatu
+func TambahFavoriteSepatuHandler(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, collectionname string, r *http.Request) string {
+	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)
+	response.Status = 400
+	//
+	user, err := GetUserLogin(PASETOPUBLICKEYENV, r)
+	if err != nil {
+		response.Message = err.Error()
+		return GCFReturnStruct(response)
+	}
+	if user.Email != "admin@gmail.com" {
+		response.Message = "Anda tidak memiliki akses, email anda : " + user.Email
+		return GCFReturnStruct(response)
+	}
+	data, err := PostFavoriteSepatu(conn, collectionname, r)
+	if err != nil {
+		response.Message = err.Error()
+		return GCFReturnStruct(response)
+	}
+	//
+	response.Status = 201
+	response.Message = "Berhasil menambah Katalog Sepatu"
+	responData := bson.M{
+		"status":  response.Status,
+		"message": response.Message,
+		"data":    data,
+	}
+	return GCFReturnStruct(responData)
+}
+
+func GetFavoriteSepatuHandler(MONGOCONNSTRINGENV, dbname string, collectionname string, r *http.Request) string {
+	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)
+	response.Status = 400
+	//
+	id := GetID(r)
+	if id == "" {
+		data, err := GetAllFavoriteSepatu(conn, collectionname)
+		if err != nil {
+			response.Message = err.Error()
+			return GCFReturnStruct(response)
+		}
+		responData := bson.M{
+			"status":  200,
+			"message": "Get Success",
+			"data":    data,
+		}
+		//
+		return GCFReturnStruct(responData)
+	}
+	idparam, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		response.Message = err.Error()
+		return GCFReturnStruct(response)
+	}
+	favoritesepatu, err := GetFavoriteSepatuById(conn, collectionname, idparam)
+	if err != nil {
+		response.Message = err.Error()
+		return GCFReturnStruct(response)
+	}
+	//
+	response.Status = 200
+	response.Message = "Get Success"
+	responData := bson.M{
+		"status":  response.Status,
+		"message": response.Message,
+		"data":    favoritesepatu,
+	}
+	return GCFReturnStruct(responData)
+}
+
+func EditFavoriteSepatuHandler(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, collectionname string, r *http.Request) string {
+	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)
+	response.Status = 400
+	//
+	user, err := GetUserLogin(PASETOPUBLICKEYENV, r)
+	if err != nil {
+		response.Message = err.Error()
+		return GCFReturnStruct(response)
+	}
+	if user.Email != "admin@gmail.com" {
+		response.Message = "Anda tidak memiliki akses"
+		return GCFReturnStruct(response)
+	}
+	id := GetID(r)
+	if id == "" {
+		response.Message = "Wrong parameter"
+		return GCFReturnStruct(response)
+	}
+	idparam, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		response.Message = "Invalid id parameter"
+		return GCFReturnStruct(response)
+	}
+	data, err := PutFavoriteSepatu(idparam, conn, collectionname, r)
+	if err != nil {
+		response.Message = err.Error()
+		return GCFReturnStruct(response)
+	}
+	//
+	response.Status = 200
+	response.Message = "Berhasil mengubah Katalog Sepatu"
+	responData := bson.M{
+		"status":  response.Status,
+		"message": response.Message,
+		"data":    data,
+	}
+	return GCFReturnStruct(responData)
+}
+
+func DeleteFavoriteSepatuHandler(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, collectionname string, r *http.Request) string {
 	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)
 	response.Status = 400
 	//

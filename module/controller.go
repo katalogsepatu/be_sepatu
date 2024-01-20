@@ -250,10 +250,11 @@ func EditEmail(idparam primitive.ObjectID, db *mongo.Database, insertedDoc model
 		return bson.M{}, fmt.Errorf("email sudah terdaftar")
 	}
 	user := bson.M{
-		"fullname":    dataUser.Fullname,
-		"email":       insertedDoc.Email,
-		"password":    dataUser.Password,
-		"phonenumber": dataUser.PhoneNumber,
+		"fullname":        dataUser.Fullname,
+		"email":           insertedDoc.Email,
+		"password":        dataUser.Password,
+		"confirmpassword": dataUser.ConfirmPassword,
+		"phonenumber":     dataUser.PhoneNumber,
 		// "image":       dataUser.Image,
 		"salt": dataUser.Salt,
 	}
@@ -296,10 +297,11 @@ func EditPassword(idparam primitive.ObjectID, db *mongo.Database, insertedDoc mo
 	}
 	hashedPassword := argon2.IDKey([]byte(insertedDoc.Newpassword), salt, 1, 64*1024, 4, 32)
 	user := bson.M{
-		"fullname":    dataUser.Fullname,
-		"email":       dataUser.Email,
-		"password":    hex.EncodeToString(hashedPassword),
-		"phonenumber": dataUser.PhoneNumber,
+		"fullname":        dataUser.Fullname,
+		"email":           dataUser.Email,
+		"password":        hex.EncodeToString(hashedPassword),
+		"confirmpassword": hex.EncodeToString(hashedPassword),
+		"phonenumber":     dataUser.PhoneNumber,
 		// "image":       dataUser.Image,
 		"salt": hex.EncodeToString(salt),
 	}
@@ -350,11 +352,12 @@ func SignUp(db *mongo.Database, col string, insertedDoc model.User) (string, err
 	}
 	hashedPassword := argon2.IDKey([]byte(insertedDoc.Password), salt, 1, 64*1024, 4, 32)
 	user := bson.M{
-		"fullname":    insertedDoc.Fullname,
-		"email":       insertedDoc.Email,
-		"password":    hex.EncodeToString(hashedPassword),
-		"phonenumber": insertedDoc.PhoneNumber,
-		"salt":        hex.EncodeToString(salt),
+		"fullname":        insertedDoc.Fullname,
+		"email":           insertedDoc.Email,
+		"password":        hex.EncodeToString(hashedPassword),
+		"confirmpassword": hex.EncodeToString(hashedPassword),
+		"phonenumber":     insertedDoc.PhoneNumber,
+		"salt":            hex.EncodeToString(salt),
 	}
 	_, err = InsertOneDoc(db, col, user)
 	if err != nil {
@@ -386,15 +389,16 @@ func LogIn(db *mongo.Database, col string, insertedDoc model.User) (user model.U
 	return existsDoc, nil
 }
 
-// Katalog Sepatu
+// post Katalog Sepatu
 func PostKatalogSepatu(db *mongo.Database, col string, r *http.Request) (bson.M, error) {
 	brand := r.FormValue("brand")
 	name := r.FormValue("name")
 	category := r.FormValue("category")
 	price := r.FormValue("price")
 	color := r.FormValue("color")
+	diskon := r.FormValue("diskon")
 
-	if brand == "" || name == "" || category == "" || price == "" || color == "" {
+	if brand == "" || name == "" || category == "" || price == "" || color == "" || diskon == "" {
 		return bson.M{}, fmt.Errorf("mohon untuk melengkapi data")
 	}
 	// if CheckLatitudeLongitude(db, latitude, longitude) {
@@ -417,6 +421,7 @@ func PostKatalogSepatu(db *mongo.Database, col string, r *http.Request) (bson.M,
 		"category": category,
 		"price":    price,
 		"color":    color,
+		"diskon":   diskon,
 		"image":    imageUrl,
 	}
 	_, err = InsertOneDoc(db, col, katalogsepatu)
@@ -426,7 +431,7 @@ func PostKatalogSepatu(db *mongo.Database, col string, r *http.Request) (bson.M,
 	return katalogsepatu, nil
 }
 
-// get KatalogSepatu
+// get Katalog Sepatu
 func GetKatalogSepatuById(db *mongo.Database, col string, idparam primitive.ObjectID) (doc model.KatalogSepatu, err error) {
 	collection := db.Collection(col)
 	filter := bson.M{"_id": idparam}
@@ -454,17 +459,18 @@ func GetAllKatalogSepatu(db *mongo.Database, col string) (docs []model.KatalogSe
 	return docs, nil
 }
 
-// put-fishingSpot
+// put Katalog Sepatu
 func PutKatalogSepatu(_id primitive.ObjectID, db *mongo.Database, col string, r *http.Request) (bson.M, error) {
 	brand := r.FormValue("brand")
 	name := r.FormValue("name")
 	category := r.FormValue("category")
 	price := r.FormValue("price")
 	color := r.FormValue("color")
+	diskon := r.FormValue("diskon")
 
 	image := r.FormValue("file")
 
-	if brand == "" || name == "" || category == "" || price == "" || color == "" {
+	if brand == "" || name == "" || category == "" || price == "" || color == "" || diskon == "" {
 		return bson.M{}, fmt.Errorf("mohon untuk melengkapi data")
 	}
 
@@ -484,6 +490,7 @@ func PutKatalogSepatu(_id primitive.ObjectID, db *mongo.Database, col string, r 
 		"category": category,
 		"price":    price,
 		"color":    color,
+		"diskon":   diskon,
 		"image":    image,
 	}
 	err := UpdateOneDoc(_id, db, col, katalogsepatu)
@@ -509,7 +516,143 @@ func PutKatalogSepatu(_id primitive.ObjectID, db *mongo.Database, col string, r 
 // 	return nil
 // }
 
+// delete Katalog
 func DeleteKatalogSepatu(_id primitive.ObjectID, col string, db *mongo.Database) error {
+	err := DeleteOneDoc(_id, db, col)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// post Favorite Sepatu
+func PostFavoriteSepatu(db *mongo.Database, col string, r *http.Request) (bson.M, error) {
+	brand := r.FormValue("brand")
+	name := r.FormValue("name")
+	category := r.FormValue("category")
+	price := r.FormValue("price")
+	color := r.FormValue("color")
+	diskon := r.FormValue("diskon")
+
+	if brand == "" || name == "" || category == "" || price == "" || color == "" || diskon == "" {
+		return bson.M{}, fmt.Errorf("mohon untuk melengkapi data")
+	}
+	// if CheckLatitudeLongitude(db, latitude, longitude) {
+	// 	return bson.M{}, fmt.Errorf("lokasi sudah terdaftar")
+	// }
+	// validatePhoneNumber, _ := ValidatePhoneNumber(phonenumber)
+	// if !validatePhoneNumber {
+	// 	return bson.M{}, fmt.Errorf("nomor telepon tidak valid")
+	// }
+
+	imageUrl, err := intermoni.SaveFileToGithub("agitanurfd", "agitanurfadillah45@gmail.com", "image-sepatu", "sepatu", r)
+	if err != nil {
+		return bson.M{}, fmt.Errorf("error save file: %s", err)
+	}
+
+	favoritesepatu := bson.M{
+		"_id":      primitive.NewObjectID(),
+		"brand":    brand,
+		"name":     name,
+		"category": category,
+		"price":    price,
+		"color":    color,
+		"diskon":   diskon,
+		"image":    imageUrl,
+	}
+	_, err = InsertOneDoc(db, col, favoritesepatu)
+	if err != nil {
+		return bson.M{}, err
+	}
+	return favoritesepatu, nil
+}
+
+// get Favorite Sepatu
+func GetFavoriteSepatuById(db *mongo.Database, col string, idparam primitive.ObjectID) (doc model.FavoriteSepatu, err error) {
+	collection := db.Collection(col)
+	filter := bson.M{"_id": idparam}
+	err = collection.FindOne(context.Background(), filter).Decode(&doc)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return doc, fmt.Errorf("data tidak ditemukan untuk ID %s", idparam)
+		}
+		return doc, fmt.Errorf("kesalahan server")
+	}
+	return doc, nil
+}
+
+func GetAllFavoriteSepatu(db *mongo.Database, col string) (docs []model.FavoriteSepatu, err error) {
+	collection := db.Collection(col)
+	filter := bson.M{}
+	cursor, err := collection.Find(context.Background(), filter)
+	if err != nil {
+		return docs, fmt.Errorf("kesalahan server")
+	}
+	err = cursor.All(context.Background(), &docs)
+	if err != nil {
+		return docs, fmt.Errorf("kesalahan server")
+	}
+	return docs, nil
+}
+
+// put Favorite Sepatu
+func PutFavoriteSepatu(_id primitive.ObjectID, db *mongo.Database, col string, r *http.Request) (bson.M, error) {
+	brand := r.FormValue("brand")
+	name := r.FormValue("name")
+	category := r.FormValue("category")
+	price := r.FormValue("price")
+	color := r.FormValue("color")
+	diskon := r.FormValue("diskon")
+
+	image := r.FormValue("file")
+
+	if brand == "" || name == "" || category == "" || price == "" || color == "" || diskon == "" {
+		return bson.M{}, fmt.Errorf("mohon untuk melengkapi data")
+	}
+
+	if image != "" {
+		imageUrl = image
+	} else {
+		imageUrl, err := intermoni.SaveFileToGithub("agitanurfd", "agitanurfadillah45@gmail.com", "image-sepatu", "sepatu", r)
+		if err != nil {
+			return bson.M{}, fmt.Errorf("error save file: %s", err)
+		}
+		image = imageUrl
+	}
+
+	favoritesepatu := bson.M{
+		"brand":    brand,
+		"name":     name,
+		"category": category,
+		"price":    price,
+		"color":    color,
+		"diskon":   diskon,
+		"image":    image,
+	}
+	err := UpdateOneDoc(_id, db, col, favoritesepatu)
+	if err != nil {
+		return bson.M{}, err
+	}
+	return favoritesepatu, nil
+}
+
+// delete-fishingSpot
+// func DeleteFishingSpot(_id primitive.ObjectID, db *mongo.Database, col string) error {
+// 	collection := db.Collection(col)
+// 	filter := bson.M{"_id": _id}
+// 	result, err := collection.DeleteOne(context.Background(), filter)
+// 	if err != nil {
+// 		return fmt.Errorf("error deleting data for ID %s: %s", _id, err.Error())
+// 	}
+
+// 	if result.DeletedCount == 0 {
+// 		return fmt.Errorf("data with ID %s not found", _id)
+// 	}
+
+// 	return nil
+// }
+
+func DeleteFavoriteSepatu(_id primitive.ObjectID, col string, db *mongo.Database) error {
 	err := DeleteOneDoc(_id, db, col)
 	if err != nil {
 		return err
