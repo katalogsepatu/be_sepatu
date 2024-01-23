@@ -659,3 +659,139 @@ func DeleteFavoriteSepatu(_id primitive.ObjectID, col string, db *mongo.Database
 	}
 	return nil
 }
+
+
+// post Kategori Sepatu
+func PostKategoriSepatu(db *mongo.Database, col string, r *http.Request) (bson.M, error) {
+	brand := r.FormValue("brand")
+	name := r.FormValue("name")
+	category := r.FormValue("category")
+	price := r.FormValue("price")
+	color := r.FormValue("color")
+	diskon := r.FormValue("diskon")
+
+	if brand == "" || name == "" || category == "" || price == "" || color == "" || diskon == "" {
+		return bson.M{}, fmt.Errorf("mohon untuk melengkapi data")
+	}
+	// if CheckLatitudeLongitude(db, latitude, longitude) {
+	// 	return bson.M{}, fmt.Errorf("lokasi sudah terdaftar")
+	// }
+	// validatePhoneNumber, _ := ValidatePhoneNumber(phonenumber)
+	// if !validatePhoneNumber {
+	// 	return bson.M{}, fmt.Errorf("nomor telepon tidak valid")
+	// }
+
+	imageUrl, err := intermoni.SaveFileToGithub("agitanurfd", "agitanurfadillah45@gmail.com", "image-sepatu", "sepatu", r)
+	if err != nil {
+		return bson.M{}, fmt.Errorf("error save file: %s", err)
+	}
+
+	kategorisepatu := bson.M{
+		"_id":      primitive.NewObjectID(),
+		"brand":    brand,
+		"name":     name,
+		"category": category,
+		"price":    price,
+		"color":    color,
+		"diskon":   diskon,
+		"image":    imageUrl,
+	}
+	_, err = InsertOneDoc(db, col, kategorisepatu)
+	if err != nil {
+		return bson.M{}, err
+	}
+	return kategorisepatu, nil
+}
+
+// get Kategori Sepatu
+func GetKategoriSepatuById(db *mongo.Database, col string, idparam primitive.ObjectID) (doc model.KategoriSepatu, err error) {
+	collection := db.Collection(col)
+	filter := bson.M{"_id": idparam}
+	err = collection.FindOne(context.Background(), filter).Decode(&doc)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return doc, fmt.Errorf("data tidak ditemukan untuk ID %s", idparam)
+		}
+		return doc, fmt.Errorf("kesalahan server")
+	}
+	return doc, nil
+}
+
+func GetAllKategoriSepatu(db *mongo.Database, col string) (docs []model.KategoriSepatu, err error) {
+	collection := db.Collection(col)
+	filter := bson.M{}
+	cursor, err := collection.Find(context.Background(), filter)
+	if err != nil {
+		return docs, fmt.Errorf("kesalahan server")
+	}
+	err = cursor.All(context.Background(), &docs)
+	if err != nil {
+		return docs, fmt.Errorf("kesalahan server")
+	}
+	return docs, nil
+}
+
+// put Kategori Sepatu
+func PutKategoriSepatu(_id primitive.ObjectID, db *mongo.Database, col string, r *http.Request) (bson.M, error) {
+	brand := r.FormValue("brand")
+	name := r.FormValue("name")
+	category := r.FormValue("category")
+	price := r.FormValue("price")
+	color := r.FormValue("color")
+	diskon := r.FormValue("diskon")
+
+	image := r.FormValue("file")
+
+	if brand == "" || name == "" || category == "" || price == "" || color == "" || diskon == "" {
+		return bson.M{}, fmt.Errorf("mohon untuk melengkapi data")
+	}
+
+	if image != "" {
+		imageUrl = image
+	} else {
+		imageUrl, err := intermoni.SaveFileToGithub("agitanurfd", "agitanurfadillah45@gmail.com", "image-sepatu", "sepatu", r)
+		if err != nil {
+			return bson.M{}, fmt.Errorf("error save file: %s", err)
+		}
+		image = imageUrl
+	}
+
+	kategorisepatu := bson.M{
+		"brand":    brand,
+		"name":     name,
+		"category": category,
+		"price":    price,
+		"color":    color,
+		"diskon":   diskon,
+		"image":    image,
+	}
+	err := UpdateOneDoc(_id, db, col, kategorisepatu)
+	if err != nil {
+		return bson.M{}, err
+	}
+	return kategorisepatu, nil
+}
+
+// delete-fishingSpot
+// func DeleteFishingSpot(_id primitive.ObjectID, db *mongo.Database, col string) error {
+// 	collection := db.Collection(col)
+// 	filter := bson.M{"_id": _id}
+// 	result, err := collection.DeleteOne(context.Background(), filter)
+// 	if err != nil {
+// 		return fmt.Errorf("error deleting data for ID %s: %s", _id, err.Error())
+// 	}
+
+// 	if result.DeletedCount == 0 {
+// 		return fmt.Errorf("data with ID %s not found", _id)
+// 	}
+
+// 	return nil
+// }
+
+func DeleteKategoriSepatu(_id primitive.ObjectID, col string, db *mongo.Database) error {
+	err := DeleteOneDoc(_id, db, col)
+	if err != nil {
+		return err
+	}
+	return nil
+}

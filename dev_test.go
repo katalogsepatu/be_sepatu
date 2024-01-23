@@ -24,11 +24,11 @@ func TestGenerateKey(t *testing.T) {
 func TestSignUp(t *testing.T) {
 	conn := db
 	var user model.User
-	user.Fullname = "Agita Nurfadillah"
-	user.Email = "agitanurf@gmail.com"
-	user.Password = "agita100303"
-	user.ConfirmPassword = "agita100303"
-	user.PhoneNumber = "6222461082281"
+	user.Fullname = "Park Jisung"
+	user.Email = "jisung@gmail.com"
+	user.Password = "jisung123"
+	user.ConfirmPassword = "jisung123"
+	user.PhoneNumber = "622109013241"
 	email, err := module.SignUp(conn, collectionnameUser, user)
 	if err != nil {
 		fmt.Println(err)
@@ -172,6 +172,59 @@ func TestDeleteFavoriteSepatu(t *testing.T) {
 		fmt.Println("Berhasil Delete Favorite Sepatu")
 	}
 }
+
+// Kategori Sepatu
+func TestTambahKategoriSepatu(t *testing.T) {
+	id, err := module.InsertOneDoc(db, "kategorisepatu", model.KategoriSepatu{
+		ID:       primitive.NewObjectID(),
+		Brand:    "Adidas",
+		Name:     "Adidas Samba",
+		Category: "Sepatu Pria",
+		Price:    "1500000",
+		Color:    "Hitam",
+		Diskon:   "25%",
+		Image: "https://www.google.com",
+	})
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println("Berhasil Tambah Kategori Sepatu : ", id)
+	}
+}
+
+func TestUpdateKategoriSepatu(t *testing.T) {
+	id := "65ab470fbcc1dce41393dbb9"
+	objectId, err := primitive.ObjectIDFromHex(id)
+
+	data := module.UpdateOneDoc(objectId, db, "kategorisepatu", model.KategoriSepatu{
+		ID:       objectId,
+		Brand:    "Adidas",
+		Name:     "Superstar Shoes",
+		Category: "Sepatu Pria",
+		Price:    "1000000",
+		Color:    "Hitam",
+		Diskon:   "25%",
+		Image: "https://www.google.com",
+	})
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println("Berhasil Update Kategori Sepatu", data)
+	}
+}
+
+func TestDeleteKategoriSepatu(t *testing.T) {
+	conn := db
+	id := "65ab470fbcc1dce41393dbb9"
+	objectId, err := primitive.ObjectIDFromHex(id)
+	err = module.DeleteKategoriSepatu(objectId, "kategorisepatu", conn)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println("Berhasil Delete Kategori Sepatu")
+	}
+}
+
 
 // func TestTambahFishingSpot(t *testing.T) {
 //     conn := db

@@ -43,6 +43,17 @@ type FavoriteSepatu struct {
 	Image    string             `json:"image,omitempty" bson:"image,omitempty"`
 }
 
+type KategoriSepatu struct {
+	ID       primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
+	Brand    string             `bson:"brand,omitempty" json:"brand,omitempty"`
+	Name     string             `bson:"name,omitempty" json:"name,omitempty"`
+	Category string             `bson:"category,omitempty" json:"category,omitempty"`
+	Price    string             `bson:"price,omitempty" json:"price,omitempty"`
+	Color    string             `bson:"color,omitempty" json:"color,omitempty"`
+	Diskon   string             `bson:"diskon,omitempty" json:"diskon,omitempty"`
+	Image    string             `json:"image,omitempty" bson:"image,omitempty"`
+}
+
 type Credential struct {
 	Status  int    `json:"status" bson:"status"`
 	Token   string `json:"token,omitempty" bson:"token,omitempty"`
